@@ -1,45 +1,48 @@
 import psycopg2
 
 
-def get_db():
-    conn = psycopg2.connect(
-        database="your_database",
-        user="your_username",
-        password="your_password",
-        host="localhost"
-    )
-    return conn
+def get_db_cursor(conn):
+    return conn.cursor()
 
 
 def create_tables():
-    commands = (
+    conn = psycopg2.connect(database="psycopg", user="mattnebeker", host="127.0.0.1", port="5432")
+    cursor = get_db_cursor(conn)
+    tables = [
         """
-        CREATE TABLE IF NOT EXISTS Companies(
+        CREATE TABLE Companies (
             company_id SERIAL PRIMARY KEY,
-            company_name VARCHAR UNIQUE NOT NULL
+            company_name VARCHAR(255) NOT NULL
         )
         """,
         """
-        CREATE TABLE IF NOT EXISTS Categories(
+        CREATE TABLE Categories (
             category_id SERIAL PRIMARY KEY,
             category_name VARCHAR UNIQUE NOT NULL
         )
         """,
         """
-        CREATE TABLE IF NOT EXISTS Products(
+        CREATE TABLE Products (
             product_id SERIAL PRIMARY KEY,
             company_id INTEGER NOT NULL,
             product_name VARCHAR(255) NOT NULL,
             price DECIMAL NOT NULL,
             description TEXT,
-            active BOOLEAN,
+            active BOOLEAN NOT NULL,
             FOREIGN KEY (company_id)
             REFERENCES Companies (company_id)
             ON UPDATE CASCADE ON DELETE CASCADE
         )
         """,
         """
-        CREATE TABLE IF NOT EXISTS Warranties(
+        CREATE TABLE ProductsCategoriesXref (
+            product_id INTEGER REFERENCES Products(product_id) ON DELETE CASCADE,
+            category_id INTEGER REFERENCES Categories(category_id) ON DELETE CASCADE,
+            PRIMARY KEY (product_id, category_id)
+        )
+        """,
+        """
+        CREATE TABLE Warranties (
             warranty_id SERIAL PRIMARY KEY,
             product_id INTEGER NOT NULL,
             warranty_months INTEGER NOT NULL,
@@ -47,26 +50,14 @@ def create_tables():
             REFERENCES Products (product_id)
             ON UPDATE CASCADE ON DELETE CASCADE
         )
-        """,
         """
-        CREATE TABLE IF NOT EXISTS ProductsCategoriesXref(
-            product_id INTEGER NOT NULL,
-            category_id INTEGER NOT NULL,
-            FOREIGN KEY (product_id)
-            REFERENCES Products (product_id)
-            ON UPDATE CASCADE ON DELETE CASCADE,
-            FOREIGN KEY (category_id)
-            REFERENCES Categories (category_id)
-            ON UPDATE CASCADE ON DELETE CASCADE
-        )
-        """
-    )
+    ]
     conn = None
     try:
-        conn = get_db()
+        conn = psycopg2.connect(database="psycopg", user="mattnebeker", host="127.0.0.1", port="5432")
         cur = conn.cursor()
-        for command in commands:
-            cur.execute(command)
+        for table in tables:
+            cur.execute(table)
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -74,7 +65,3 @@ def create_tables():
     finally:
         if conn is not None:
             conn.close()
-
-
-if __name__ == '__main__':
-    create_tables()
