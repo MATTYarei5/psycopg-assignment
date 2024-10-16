@@ -77,8 +77,12 @@ def update_company(company_id):
 @app.route('/company/<int:company_id>', methods=['DELETE'])
 def delete_company(company_id):
     cursor = get_db_cursor(conn)
-    cursor.execute("DELETE FROM Companies WHERE company_id = %s", (company_id,))
-    return jsonify({"message": "company deleted"}), 200
+    try:
+        cursor.execute("DELETE FROM Companies WHERE company_id = %s", (company_id,))
+        conn.commit()
+        return jsonify({"message": "company deleted"}), 200
+    except Exception as e:
+        return jsonify({"message": "an error occurred", "error": (e)}), 500
 
 
 @app.route('/category', methods=['POST'])
@@ -152,8 +156,12 @@ def update_category(category_id):
 @app.route('/category/<int:category_id>', methods=['DELETE'])
 def delete_category(category_id):
     cursor = get_db_cursor(conn)
-    cursor.execute("DELETE FROM Categories WHERE category_id = %s", (category_id,))
-    return jsonify({"message": "category deleted"}), 200
+    try:
+        cursor.execute("DELETE FROM Categories WHERE category_id = %s", (category_id,))
+        conn.commit()
+        return jsonify({"message": "category deleted"}), 200
+    except Exception as e:
+        return jsonify({"message": "an error occurred", "error": (e)}), 500
 
 
 @app.route('/product', methods=['POST'])
@@ -251,8 +259,12 @@ def update_product(product_id):
 @app.route('/product/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
     cursor = get_db_cursor(conn)
-    cursor.execute("DELETE FROM Products WHERE product_id = %s", (product_id,))
-    return jsonify({"message": "product deleted"}), 200
+    try:
+        cursor.execute("DELETE FROM Products WHERE product_id = %s", (product_id,))
+        conn.commit()
+        return jsonify({"message": "product deleted"}), 200
+    except Exception as e:
+        return jsonify({"message": "an error occurred", "error": (e)}), 500
 
 
 @app.route('/warranty', methods=['POST'])
@@ -332,8 +344,12 @@ def update_warranty(warranty_id):
 @app.route('/warranty/<int:warranty_id>', methods=['DELETE'])
 def delete_warranty(warranty_id):
     cursor = get_db_cursor(conn)
-    cursor.execute("DELETE FROM Warranties WHERE warranty_id = %s", (warranty_id,))
-    return jsonify({"message": "warranty deleted"}), 200
+    try:
+        cursor.execute("DELETE FROM Warranties WHERE warranty_id = %s", (warranty_id,))
+        conn.commit()
+        return jsonify({"message": "warranty deleted"}), 200
+    except Exception as e:
+        return jsonify({"message": "an error occurred", "error": (e)}), 500
 
 
 @app.route('/productscategory', methods=['POST'])
@@ -413,8 +429,12 @@ def update_product_category(xref_id):
 @app.route('/productscategory/<int:xref_id>', methods=['DELETE'])
 def delete_product_category(xref_id):
     cursor = get_db_cursor(conn)
-    cursor.execute("DELETE FROM ProductsCategoriesXref WHERE xref_id = %s", (xref_id,))
-    return jsonify({"message": "product category deleted"}), 200
+    try:
+        cursor.execute("DELETE FROM ProductsCategoriesXref WHERE xref_id = %s", (xref_id,))
+        conn.commit()
+        return jsonify({"message": "product category deleted"}), 200
+    except Exception as e:
+        return jsonify({"message": "an error occurred", "error": (e)}), 500
 
 
 if __name__ == "__main__":
